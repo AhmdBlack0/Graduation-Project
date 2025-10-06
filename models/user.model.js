@@ -2,58 +2,47 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    username: {
+    name: {
       type: String,
-      required: [true, "Username is required"],
+      required: true,
     },
     email: {
       type: String,
-      required: [true, "Email is required"],
+      required: true,
+      unique: true,
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: true,
+    },
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    avatar: {
+      public_id: String,
+      url: String,
     },
     role: {
       type: String,
-      enum: ["customer", "admin", "vendor"],
-      default: "customer",
+      default: "user",
+      enum: ["user", "admin"],
     },
-    phone: {
-      type: String,
-      default: "",
-    },
-    profilePicture: {
-      type: String,
-      default: "",
-    },
-    cart: [
-      {
-        ref: "Product",
-        type: mongoose.Schema.Types.ObjectId,
-      },
-    ],
-    watchList: [
-      {
-        ref: "Product",
-        type: mongoose.Schema.Types.ObjectId,
-      },
-    ],
     isVerified: {
       type: Boolean,
       default: false,
     },
-    verificationToken: {
+    verificationCode: {
       type: String,
     },
-    verificationTokenExpires: {
+    verificationCodeExpires: {
       type: Date,
     },
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-const User = mongoose.model("User", userSchema);
-export default User;
+export default mongoose.model("User", userSchema);
