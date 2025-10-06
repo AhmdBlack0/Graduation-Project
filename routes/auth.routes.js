@@ -4,20 +4,18 @@ import {
   login,
   verifyEmail,
   resendVerification,
+  forgotPassword,
+  getMe,
 } from "../controllers/auth.controller.js";
+import { verifyToken } from "../middlewares/verifyToken.js";
 
 const router = express.Router();
 
-// Register new user (sends verification code via email)
 router.post("/register", register);
-
-// Verify email with code
-router.post("/verify-email", verifyEmail);
-
-// Resend verification code
-router.post("/resend-verification", resendVerification);
-
-// Login (only works if email is verified)
 router.post("/login", login);
+router.get("/me", verifyToken, getMe);
+router.post("/verify-email", verifyEmail);
+router.post("/resend-verification", resendVerification);
+router.post("/forget-password", forgotPassword);
 
 export default router;
