@@ -259,7 +259,7 @@ export const updateProfile = async (req, res) => {
         await cloudinary.uploader.destroy(user.avatar.public_id);
       }
     }
-    const user = await User.findByIdAndUpdate(req.user.id, updates, {
+    const user = await User.findByIdAndUpdate(req.userId, updates, {
       new: true,
     }).select(
       "-password -__v -verificationCode -verificationCodeExpires -resetPasswordToken -resetPasswordExpires"
@@ -274,7 +274,7 @@ export const updateProfile = async (req, res) => {
 export const changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -295,7 +295,7 @@ export const changePassword = async (req, res) => {
 
 export const deleteAccount = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("+password");
+    const user = await User.findById(req.userId).select("+password");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -307,7 +307,7 @@ export const deleteAccount = async (req, res) => {
     if (user.avatar && user.avatar.public_id) {
       await cloudinary.uploader.destroy(user.avatar.public_id);
     }
-    await user.remove();
+    await user.deleteOne();
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
