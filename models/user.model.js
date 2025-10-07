@@ -20,10 +20,6 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    avatar: {
-      public_id: String,
-      url: String,
-    },
     role: {
       type: String,
       default: "user",
