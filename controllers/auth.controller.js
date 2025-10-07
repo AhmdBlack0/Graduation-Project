@@ -129,9 +129,28 @@ export const verifyEmail = async (req, res) => {
     user.verificationCodeExpires = undefined;
     await user.save();
 
+    // ✅ توليد JWT جديد يعكس حالة التفعيل الجديدة
+    const tokenPayload = {
+      userId: user._id,
+      role: user.role,
+      isVerified: true,
+    };
+
+    const jwtToken = jwt.sign(tokenPayload, process.env.JWT_SECRET_KEY, {
+      expiresIn: "7d",
+    });
+
+    // ✅ تخزين التوكن في الكوكي
+    res.cookie("jwt", jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // أسبوع
+    });
+
     res.status(200).json({
       success: true,
-      message: "Email verified successfully! You can now login.",
+      message: "Email verified successfully! You can now access your account.",
     });
   } catch (error) {
     console.error("Verify Email Error:", error);
