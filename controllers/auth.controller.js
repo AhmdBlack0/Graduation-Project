@@ -319,7 +319,7 @@ export const deleteAccount = async (req, res) => {
       await cloudinary.uploader.destroy(user.avatar.public_id);
     }
     await user.deleteOne();
-    res.clearCookie("token", {
+    res.clearCookie("jwt", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Lax",
