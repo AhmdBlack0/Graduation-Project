@@ -4,6 +4,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { generateTokenAndSetCookie } from "../lib/generateTokenAndSetCookie.js";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
+import jwt from "jsonwebtoken";
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
