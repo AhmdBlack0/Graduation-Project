@@ -8,6 +8,7 @@ import {
   getMe,
   updateProfile,
   deleteAccount,
+  logout,
 } from "../controllers/auth.controller.js";
 import { verifyToken } from "../middlewares/verifyToken.js";
 
@@ -21,5 +22,6 @@ router.delete("/delete-me", verifyToken, deleteAccount);
 router.post("/verify-email", verifyEmail);
 router.post("/resend-verification", resendVerification);
 router.post("/forget-password", forgotPassword);
+router.post("/logout", verifyToken, logout);
 
 export default router;
