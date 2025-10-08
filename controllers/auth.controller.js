@@ -150,7 +150,6 @@ export const resendVerification = async (req, res) => {
     user.verificationCodeExpires = Date.now() + 600000;
     await user.save();
 
-    // Send new verification email
     await transporter.sendMail({
       from: `"My App" <${process.env.EMAIL_USER}>`,
       to: user.email,
@@ -288,7 +287,6 @@ export const deleteAccount = async (req, res) => {
   }
 };
 
-// Forgot Password
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -337,14 +335,15 @@ export const forgotPassword = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    res.clearCookie("jwt", {
+    res.cookie("jwt", "", {
       httpOnly: true,
+      expires: new Date(0),
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Lax",
     });
-    res.status(200).json({ success: true, message: "Logged out successfully" });
+
+    res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
-    console.error("Logout Error:", error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Logout failed", error: error.message });
   }
 };
