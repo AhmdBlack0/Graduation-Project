@@ -6,7 +6,13 @@ const bookSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
+    author: {
+      type: String,
+      required: true,
+    },
+    details: {
+      type: String,
+    },
     category: {
       type: String,
       required: true,
@@ -18,12 +24,10 @@ const bookSchema = new mongoose.Schema(
         "كتب اللغة والأدب",
       ],
     },
-
     subCategory: {
       type: String,
       required: true,
     },
-
     content: {
       type: [String],
       required: true,

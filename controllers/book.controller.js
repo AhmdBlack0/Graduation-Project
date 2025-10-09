@@ -2,9 +2,22 @@ import Book from "../models/book.model.js";
 
 export const createBook = async (req, res) => {
   try {
-    const book = new Book(req.body);
-    await book.save();
-    res.status(201).json(book);
+    const { title, author, details, category, subCategory, content } = req.body;
+    if (!title || !author || !category || !subCategory || !content) {
+      return res
+        .status(400)
+        .json({ message: "All required fields must be filled." });
+    }
+    const newBook = new Book({
+      title,
+      author,
+      details,
+      category,
+      subCategory,
+      content,
+    });
+    const savedBook = await newBook.save();
+    res.status(201).json(savedBook);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
