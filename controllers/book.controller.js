@@ -30,13 +30,28 @@ export const createBook = async (req, res) => {
   }
 };
 
+function safeParseJSON(str) {
+  try {
+    return JSON.parse(str);
+  } catch {
+    return str;
+  }
+}
+
 export const getBooks = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
+
     const books = await Book.find()
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
-    res.status(200).json(books);
+
+    const parsedBooks = books.map((book) => ({
+      ...book._doc,
+      content: safeParseJSON(book.content),
+    }));
+
+    res.status(200).json(parsedBooks);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
