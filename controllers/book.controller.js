@@ -144,7 +144,6 @@ export const updatePageContent = async (req, res) => {
   }
 };
 
-// ✅ 5️⃣ حذف كتاب
 export const deleteBook = async (req, res) => {
   try {
     const { id } = req.params;
