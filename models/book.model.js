@@ -28,18 +28,10 @@ const bookSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    content: [
-      {
-        page_number: {
-          type: Number,
-          required: true,
-        },
-        content: {
-          type: String,
-          required: true,
-        },
-      },
-    ],
+    content: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );
