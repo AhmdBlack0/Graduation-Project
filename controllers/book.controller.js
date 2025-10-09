@@ -1,6 +1,6 @@
 import Book from "../models/book.model.js";
 
-// ✅ لتحويل النص إلى JSON بأمان
+// دالة آمنة لتحويل JSON string إلى Object
 function safeParseJSON(str) {
   try {
     return JSON.parse(str);
@@ -9,7 +9,7 @@ function safeParseJSON(str) {
   }
 }
 
-// ✅ إنشاء كتاب جديد
+// ✅ 1️⃣ إنشاء كتاب جديد
 export const createBook = async (req, res) => {
   try {
     const { title, author, details, category, subCategory, content } = req.body;
@@ -20,7 +20,6 @@ export const createBook = async (req, res) => {
         .json({ message: "All required fields must be filled." });
     }
 
-    // 🔹 لو المحتوى مش string نحوله إلى JSON string
     const contentString =
       typeof content === "string" ? content : JSON.stringify(content);
 
@@ -40,10 +39,10 @@ export const createBook = async (req, res) => {
   }
 };
 
-// ✅ جلب كل الكتب (مع pagination)
+// ✅ 2️⃣ Pagination للكتب (قائمة الكتب)
 export const getBooks = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10 } = req.query; // pagination للكتب فقط
 
     const totalBooks = await Book.countDocuments();
     const books = await Book.find()
@@ -52,7 +51,7 @@ export const getBooks = async (req, res) => {
 
     const parsedBooks = books.map((book) => ({
       ...book._doc,
-      content: safeParseJSON(book.content),
+      content: undefined, // لا نرسل المحتوى في القائمة
     }));
 
     res.status(200).json({
@@ -66,76 +65,77 @@ export const getBooks = async (req, res) => {
   }
 };
 
-// ✅ جلب كتاب واحد (مع دعم page داخل المحتوى)
+// ✅ 3️⃣ جلب كتاب واحد (مع Pagination داخل الصفحات)
 export const getBookById = async (req, res) => {
   try {
     const { id } = req.params;
-    const { page } = req.query;
+    const { page = 1, limit = 1 } = req.query; // pagination داخل الكتاب
 
     const book = await Book.findById(id);
-    if (!book) {
-      return res.status(404).json({ message: "Book not found" });
-    }
+    if (!book) return res.status(404).json({ message: "Book not found" });
 
     const parsedContent = safeParseJSON(book.content);
 
-    // 🔹 لو الكتاب فيه صفحات داخلية
-    if (Array.isArray(parsedContent) && page) {
-      const pageNumber = parseInt(page);
-      const pageContent = parsedContent.find((p) => p.page === pageNumber);
-      if (!pageContent)
-        return res.status(404).json({ message: "Page not found" });
+    // لو المحتوى عبارة عن صفحات
+    if (
+      parsedContent &&
+      parsedContent.pages &&
+      Array.isArray(parsedContent.pages)
+    ) {
+      const totalPages = parsedContent.pages.length;
+
+      const start = (page - 1) * limit;
+      const end = start + parseInt(limit);
+      const pagedContent = parsedContent.pages.slice(start, end);
 
       return res.status(200).json({
         ...book._doc,
-        totalPages: parsedContent.length,
-        currentPage: pageNumber,
-        content: pageContent,
+        totalPages,
+        currentPage: parseInt(page),
+        pages: pagedContent,
       });
     }
 
-    // 🔹 لو الكتاب بدون صفحات
+    // لو المحتوى بدون صفحات
     res.status(200).json({
       ...book._doc,
-      content: parsedContent,
+      totalPages: 1,
+      currentPage: 1,
+      pages: [{ page_number: 1, content: parsedContent }],
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// ✅ تحديث المحتوى (صفحة معينة أو كامل)
-export const updateContent = async (req, res) => {
+// ✅ 4️⃣ تحديث صفحة محددة داخل الكتاب
+export const updatePageContent = async (req, res) => {
   try {
     const { id } = req.params;
-    const { content, page } = req.body;
+    const { page_number, content } = req.body;
 
-    if (!content) {
-      return res.status(400).json({ message: "Content is required." });
-    }
+    if (!page_number || !content)
+      return res
+        .status(400)
+        .json({ message: "page_number and content are required" });
 
     const book = await Book.findById(id);
-    if (!book) {
-      return res.status(404).json({ message: "Book not found" });
-    }
+    if (!book) return res.status(404).json({ message: "Book not found" });
 
-    let parsedContent = safeParseJSON(book.content);
-    if (!Array.isArray(parsedContent)) parsedContent = [];
+    const parsed = safeParseJSON(book.content);
+    if (!parsed.pages || !Array.isArray(parsed.pages))
+      return res.status(400).json({ message: "Invalid book content format" });
 
-    if (page) {
-      const pageNumber = parseInt(page);
-      const existingPage = parsedContent.find((p) => p.page === pageNumber);
-
-      if (existingPage) {
-        existingPage.text = content;
-      } else {
-        parsedContent.push({ page: pageNumber, text: content });
-      }
+    const pageIndex = parsed.pages.findIndex(
+      (p) => p.page_number === page_number
+    );
+    if (pageIndex === -1) {
+      parsed.pages.push({ page_number, content });
     } else {
-      parsedContent = content;
+      parsed.pages[pageIndex].content = content;
     }
 
-    book.content = JSON.stringify(parsedContent);
+    book.content = JSON.stringify(parsed);
     const updatedBook = await book.save();
 
     res.status(200).json(updatedBook);
@@ -144,14 +144,12 @@ export const updateContent = async (req, res) => {
   }
 };
 
-// ✅ حذف كتاب
+// ✅ 5️⃣ حذف كتاب
 export const deleteBook = async (req, res) => {
   try {
     const { id } = req.params;
     const book = await Book.findByIdAndDelete(id);
-    if (!book) {
-      return res.status(404).json({ message: "Book not found" });
-    }
+    if (!book) return res.status(404).json({ message: "Book not found" });
     res.status(200).json({ message: "Book deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
