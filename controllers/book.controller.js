@@ -39,10 +39,10 @@ export const createBook = async (req, res) => {
   }
 };
 
-// ✅ 2️⃣ Pagination للكتب (قائمة الكتب)
+// ✅ 2️⃣ Pagination للكتب
 export const getBooks = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query; // pagination للكتب فقط
+    const { page = 1, limit = 10 } = req.query;
 
     const totalBooks = await Book.countDocuments();
     const books = await Book.find()
@@ -51,7 +51,7 @@ export const getBooks = async (req, res) => {
 
     const parsedBooks = books.map((book) => ({
       ...book._doc,
-      content: undefined, // لا نرسل المحتوى في القائمة
+      content: undefined, // لا نرسل المحتوى هنا
     }));
 
     res.status(200).json({
@@ -65,11 +65,11 @@ export const getBooks = async (req, res) => {
   }
 };
 
-// ✅ 3️⃣ جلب كتاب واحد (مع Pagination داخل الصفحات)
+// ✅ 3️⃣ جلب كتاب واحد (مع Pagination للصفحات + content JSON)
 export const getBookById = async (req, res) => {
   try {
     const { id } = req.params;
-    const { page = 1, limit = 1 } = req.query; // pagination داخل الكتاب
+    const { page = 1, limit = 1 } = req.query;
 
     const book = await Book.findById(id);
     if (!book) return res.status(404).json({ message: "Book not found" });
@@ -83,22 +83,23 @@ export const getBookById = async (req, res) => {
       Array.isArray(parsedContent.pages)
     ) {
       const totalPages = parsedContent.pages.length;
-
       const start = (page - 1) * limit;
       const end = start + parseInt(limit);
       const pagedContent = parsedContent.pages.slice(start, end);
 
       return res.status(200).json({
         ...book._doc,
+        content: parsedContent, // ✅ هنا رجعنا المحتوى كـ JSON كامل
         totalPages,
         currentPage: parseInt(page),
         pages: pagedContent,
       });
     }
 
-    // لو المحتوى بدون صفحات
+    // لو المحتوى مش صفحات
     res.status(200).json({
       ...book._doc,
+      content: parsedContent, // ✅ هنا كمان JSON
       totalPages: 1,
       currentPage: 1,
       pages: [{ page_number: 1, content: parsedContent }],
@@ -138,12 +139,16 @@ export const updatePageContent = async (req, res) => {
     book.content = JSON.stringify(parsed);
     const updatedBook = await book.save();
 
-    res.status(200).json(updatedBook);
+    res.status(200).json({
+      ...updatedBook._doc,
+      content: parsed, // ✅ نرجع المحتوى بصيغة JSON
+    });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
+// ✅ 5️⃣ حذف كتاب
 export const deleteBook = async (req, res) => {
   try {
     const { id } = req.params;
