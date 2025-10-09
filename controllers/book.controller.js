@@ -3,19 +3,26 @@ import Book from "../models/book.model.js";
 export const createBook = async (req, res) => {
   try {
     const { title, author, details, category, subCategory, content } = req.body;
+
     if (!title || !author || !category || !subCategory || !content) {
       return res
         .status(400)
         .json({ message: "All required fields must be filled." });
     }
+
+    // ✅ هنا بنحول الـ content إلى نص JSON
+    const contentString =
+      typeof content === "string" ? content : JSON.stringify(content);
+
     const newBook = new Book({
       title,
       author,
       details,
       category,
       subCategory,
-      content,
+      content: contentString,
     });
+
     const savedBook = await newBook.save();
     res.status(201).json(savedBook);
   } catch (error) {
