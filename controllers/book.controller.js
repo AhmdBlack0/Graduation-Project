@@ -65,7 +65,6 @@ export const getBooks = async (req, res) => {
   }
 };
 
-// ✅ 3️⃣ جلب كتاب واحد (مع Pagination للصفحات + content JSON)
 export const getBookById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -87,22 +86,17 @@ export const getBookById = async (req, res) => {
       const end = start + parseInt(limit);
       const pagedContent = parsedContent.pages.slice(start, end);
 
-      return res.status(200).json({
-        ...book._doc,
-        content: parsedContent, // ✅ هنا رجعنا المحتوى كـ JSON كامل
-        totalPages,
-        currentPage: parseInt(page),
-        pages: pagedContent,
-      });
+      // ✅ رجّع الصفحة المطلوبة فقط
+      if (pagedContent.length === 0)
+        return res.status(404).json({ message: "Page not found" });
+
+      return res.status(200).json(pagedContent[0]); // فقط صفحة واحدة
     }
 
-    // لو المحتوى مش صفحات
-    res.status(200).json({
-      ...book._doc,
-      content: parsedContent, // ✅ هنا كمان JSON
-      totalPages: 1,
-      currentPage: 1,
-      pages: [{ page_number: 1, content: parsedContent }],
+    // لو المحتوى مش صفحات (نص واحد فقط)
+    return res.status(200).json({
+      page_number: 1,
+      content: parsedContent,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
