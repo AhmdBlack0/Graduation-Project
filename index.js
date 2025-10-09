@@ -27,7 +27,7 @@ cloudinary.config({
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://e-book-commerce.vercel.app/"],
+    origin: ["http://localhost:5173", "https://e-book-commerce.vercel.app"],
     credentials: true,
   })
 );
