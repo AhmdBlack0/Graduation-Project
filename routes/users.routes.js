@@ -4,7 +4,7 @@ import { verifyAdmin } from "../middlewares/verifyAdmin.js";
 
 const router = express.Router();
 
-router.get("/users", verifyAdmin, getAllUsers);
-router.get("/user/:id", getUserById);
+router.get("/", verifyAdmin, getAllUsers);
+router.get("/:id", getUserById);
 
 export default router;
