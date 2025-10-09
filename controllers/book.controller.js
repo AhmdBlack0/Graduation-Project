@@ -75,7 +75,6 @@ export const getBookById = async (req, res) => {
 
     const parsedContent = safeParseJSON(book.content);
 
-    // لو المحتوى عبارة عن صفحات
     if (
       parsedContent &&
       parsedContent.pages &&
@@ -86,15 +85,24 @@ export const getBookById = async (req, res) => {
       const end = start + parseInt(limit);
       const pagedContent = parsedContent.pages.slice(start, end);
 
-      // ✅ رجّع الصفحة المطلوبة فقط
-      if (pagedContent.length === 0)
-        return res.status(404).json({ message: "Page not found" });
+      // ✅ لو limit = 1 رجّع صفحة واحدة فقط
+      if (parseInt(limit) === 1 && pagedContent.length > 0) {
+        return res.status(200).json({
+          page_number: pagedContent[0].page_number,
+          content: pagedContent[0].content,
+        });
+      }
 
-      return res.status(200).json(pagedContent[0]); // فقط صفحة واحدة
+      // ✅ لو limit > 1 رجّع مصفوفة صفحات
+      return res.status(200).json({
+        totalPages,
+        currentPage: parseInt(page),
+        pages: pagedContent,
+      });
     }
 
-    // لو المحتوى مش صفحات (نص واحد فقط)
-    return res.status(200).json({
+    // لو الكتاب مش فيه صفحات
+    res.status(200).json({
       page_number: 1,
       content: parsedContent,
     });
