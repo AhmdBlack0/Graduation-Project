@@ -28,10 +28,18 @@ const bookSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    content: {
-      type: [String],
-      required: true,
-    },
+    content: [
+      {
+        page_number: {
+          type: Number,
+          required: true,
+        },
+        content: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );
@@ -49,12 +57,12 @@ const categorySubMap = {
     "الإعلام",
     "علم الاجتماع",
   ],
-
   "العلوم الاقتصادية والإدارية": ["الإدارة", "الاقتصاد", "السياسة"],
   "كتب القانون": ["القانون", "الشريعة والدعوة"],
   "كتب اللغة والأدب": ["الأدب", "اللغة", "المعاجم", "الشعر والقصة"],
 };
 
+// ✅ التحقق من أن subCategory صحيحة
 bookSchema.pre("validate", function (next) {
   const validSubs = categorySubMap[this.category];
   if (validSubs && !validSubs.includes(this.subCategory)) {
