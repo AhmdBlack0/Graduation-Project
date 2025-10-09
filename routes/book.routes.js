@@ -5,6 +5,7 @@ import {
   getBookById,
   updatePageContent,
   deleteBook,
+  updateBook,
 } from "../controllers/book.controller.js";
 
 import { verifyToken } from "../middlewares/verifyToken.js";
@@ -15,6 +16,7 @@ const router = express.Router();
 router.post("/", verifyToken, verifyAdmin, createBook);
 router.get("/", getBooks);
 router.get("/:id", getBookById);
+router.patch("/:id", verifyToken, verifyAdmin, updateBook);
 router.put("/:id/page", verifyToken, verifyAdmin, updatePageContent);
 router.delete("/:id", verifyToken, verifyAdmin, deleteBook);
 

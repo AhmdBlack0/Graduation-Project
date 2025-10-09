@@ -111,7 +111,23 @@ export const getBookById = async (req, res) => {
   }
 };
 
-// ✅ 4️⃣ تحديث صفحة محددة داخل الكتاب
+export const updateBook = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, author, category, subCategory } = req.body;
+    const book = await Book.findById(id);
+    if (!book) return res.status(404).json({ message: "Book not found" });
+    if (title) book.title = title;
+    if (author) book.author = author;
+    if (category) book.category = category;
+    if (subCategory) book.subCategory = subCategory;
+    const updatedBook = await book.save();
+    res.status(200).json(updatedBook);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
 export const updatePageContent = async (req, res) => {
   try {
     const { id } = req.params;
