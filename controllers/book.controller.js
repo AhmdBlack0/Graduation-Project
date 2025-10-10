@@ -259,12 +259,15 @@ export const createCategory = async (req, res) => {
   }
 };
 
-export const getAllCategoriesWithSubs = async (req, res) => {
+export const getAllCategories = async (req, res) => {
   try {
+    // هجيب كل الكاتيجوريز من الداتا بيز
     const categories = await Category.find();
 
+    // هبني النتيجة النهائية
     const result = await Promise.all(
       categories.map(async (cat) => {
+        // أجيب الـsubcategories المميزة لكل category
         const subCategories = await Book.distinct("subCategory", {
           category: cat.name,
         });
@@ -279,6 +282,7 @@ export const getAllCategoriesWithSubs = async (req, res) => {
 
     res.status(200).json(result);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 };
