@@ -106,13 +106,13 @@ export const getBookById = async (req, res) => {
         book: {
           ...book._doc,
           content: undefined,
+          totalPages,
+          currentPage: parseInt(page),
+          pages:
+            parseInt(limit) === 1 && pagedContent.length
+              ? pagedContent[0]
+              : pagedContent,
         },
-        totalPages,
-        currentPage: parseInt(page),
-        pages:
-          parseInt(limit) === 1 && pagedContent.length
-            ? pagedContent[0]
-            : pagedContent,
       });
     }
 
