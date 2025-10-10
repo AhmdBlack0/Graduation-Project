@@ -13,15 +13,19 @@ const bookSchema = new mongoose.Schema(
     details: {
       type: String,
     },
+    bookImg: {
+      type: String,
+      default: "",
+    },
     category: {
       type: String,
       required: true,
       enum: [
-        "العلوم التربوية والاجتماعية",
-        "العلوم الإنسانية",
-        "العلوم الاقتصادية والإدارية",
-        "كتب القانون",
-        "كتب اللغة والأدب",
+        "educational and social sciences",
+        "humanities",
+        "economic and administrative sciences",
+        "law books",
+        "language and literature books",
       ],
     },
     subCategory: {
@@ -62,7 +66,6 @@ const categorySubMap = {
   ],
 };
 
-// ✅ التحقق من أن subCategory صحيحة
 bookSchema.pre("validate", function (next) {
   const validSubs = categorySubMap[this.category];
   if (validSubs && !validSubs.includes(this.subCategory)) {
