@@ -259,10 +259,25 @@ export const createCategory = async (req, res) => {
   }
 };
 
-export const getCategories = async (req, res) => {
+export const getAllCategoriesWithSub = async (req, res) => {
   try {
-    const categories = await Category.find().sort({ createdAt: -1 });
-    res.status(200).json(categories);
+    const books = await Book.find({}, "category subCategory");
+
+    const categoryMap = {};
+
+    books.forEach((book) => {
+      if (!categoryMap[book.category]) {
+        categoryMap[book.category] = new Set();
+      }
+      categoryMap[book.category].add(book.subCategory);
+    });
+
+    const result = Object.keys(categoryMap).map((category) => ({
+      category,
+      subCategories: Array.from(categoryMap[category]),
+    }));
+
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

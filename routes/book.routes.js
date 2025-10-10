@@ -9,6 +9,7 @@ import {
   updateCategoryImage,
   getCategories,
   createCategory,
+  getAllCategoriesWithSub,
 } from "../controllers/book.controller.js";
 
 import { verifyToken } from "../middlewares/verifyToken.js";
@@ -16,7 +17,7 @@ import { verifyAdmin } from "../middlewares/verifyAdmin.js";
 
 const router = express.Router();
 
-router.get("/categories", verifyToken, verifyAdmin, getCategories);
+router.get("/categories", verifyToken, verifyAdmin, getAllCategoriesWithSub);
 router.post("/categories", verifyToken, verifyAdmin, createCategory);
 
 router.post("/", verifyToken, verifyAdmin, createBook);
