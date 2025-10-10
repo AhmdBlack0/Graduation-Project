@@ -91,7 +91,7 @@ export const getBookById = async (req, res) => {
     const { id } = req.params;
     const { page = 1, limit = 1 } = req.query;
 
-    const book = await Book.findById(id);
+    const book = await Book.findById(id).select("-__v");
     if (!book) return res.status(404).json({ message: "Book not found" });
 
     const parsedContent = safeParseJSON(book.content);
