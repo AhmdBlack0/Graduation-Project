@@ -22,7 +22,7 @@ router.post("/categories", verifyToken, verifyAdmin, createCategory);
 
 router.post("/", verifyToken, verifyAdmin, createBook);
 router.get("/", getBooks);
-router.get("/:id", getBookContent);
+router.get("/:id/content", getBookContent);
 router.get("/:id", getBookById);
 router.patch("/:id", verifyToken, verifyAdmin, updateBook);
 router.put("/:id/page", verifyToken, verifyAdmin, updatePageContent);
