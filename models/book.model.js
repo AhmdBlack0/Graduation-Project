@@ -37,20 +37,29 @@ const bookSchema = new mongoose.Schema(
 );
 
 const categorySubMap = {
-  "العلوم التربوية والاجتماعية": ["علم النفس", "علم الاجتماع", "علم التربية"],
-  "العلوم الإنسانية": [
-    "التاريخ",
-    "الجغرافيا",
-    "الفلسفة والفكر",
-    "الثقافة",
-    "الآثار",
-    "التراث",
-    "الإعلام",
-    "علم الاجتماع",
+  "educational and social sciences": ["psychology", "sociology", "education"],
+  humanities: [
+    "history",
+    "geography",
+    "philosophy and thought",
+    "culture",
+    "archaeology",
+    "heritage",
+    "media",
+    "sociology",
   ],
-  "العلوم الاقتصادية والإدارية": ["الإدارة", "الاقتصاد", "السياسة"],
-  "كتب القانون": ["القانون", "الشريعة والدعوة"],
-  "كتب اللغة والأدب": ["الأدب", "اللغة", "المعاجم", "الشعر والقصة"],
+  "economic and administrative sciences": [
+    "management",
+    "economics",
+    "politics",
+  ],
+  "law books": ["law", "sharia and preaching"],
+  "language and literature books": [
+    "literature",
+    "language",
+    "dictionaries",
+    "poetry and stories",
+  ],
 };
 
 // ✅ التحقق من أن subCategory صحيحة
