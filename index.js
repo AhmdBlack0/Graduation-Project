@@ -5,6 +5,7 @@ import connectDB from "./db/connectDB.js";
 import authRoutes from "./routes/auth.routes.js";
 import usersRoutes from "./routes/users.routes.js";
 import booksRoutes from "./routes/book.routes.js";
+import newsRoutes from "./routes/news.routes.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import fileUpload from "express-fileupload";
@@ -39,6 +40,7 @@ app.use(
 app.use("/api/auth", authRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/books", booksRoutes);
+app.use("/api/news", newsRoutes);
 
 const startServer = async () => {
   try {
