@@ -89,9 +89,20 @@ export const getBooks = async (req, res) => {
 export const getBookById = async (req, res) => {
   try {
     const { id } = req.params;
+    const book = await Book.findById(id).select("-__v -content");
+    if (!book) return res.status(404).json({ message: "Book not found" });
+    res.status(200).json(book);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getBookContent = async (req, res) => {
+  try {
+    const { id } = req.params;
     const { page = 1, limit = 1 } = req.query;
 
-    const book = await Book.findById(id).select("-__v");
+    const book = await Book.findById(id);
     if (!book) return res.status(404).json({ message: "Book not found" });
 
     const parsedContent = safeParseJSON(book.content);
@@ -103,16 +114,12 @@ export const getBookById = async (req, res) => {
       const pagedContent = parsedContent.pages.slice(start, end);
 
       return res.status(200).json({
-        book: {
-          ...book._doc,
-          content: undefined,
-          totalPages,
-          currentPage: parseInt(page),
-          pages:
-            parseInt(limit) === 1 && pagedContent.length
-              ? pagedContent[0]
-              : pagedContent,
-        },
+        totalPages,
+        currentPage: parseInt(page),
+        pages:
+          parseInt(limit) === 1 && pagedContent.length
+            ? pagedContent[0]
+            : pagedContent,
       });
     }
 

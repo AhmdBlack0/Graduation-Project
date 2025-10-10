@@ -2,13 +2,14 @@ import express from "express";
 import {
   createBook,
   getBooks,
-  getBookById,
+  getBookContent,
   updatePageContent,
   deleteBook,
   updateBook,
   updateCategoryImage,
   createCategory,
   getAllCategories,
+  getBookById,
 } from "../controllers/book.controller.js";
 
 import { verifyToken } from "../middlewares/verifyToken.js";
@@ -21,6 +22,7 @@ router.post("/categories", verifyToken, verifyAdmin, createCategory);
 
 router.post("/", verifyToken, verifyAdmin, createBook);
 router.get("/", getBooks);
+router.get("/:id", getBookContent);
 router.get("/:id", getBookById);
 router.patch("/:id", verifyToken, verifyAdmin, updateBook);
 router.put("/:id/page", verifyToken, verifyAdmin, updatePageContent);
