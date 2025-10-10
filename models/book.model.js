@@ -21,11 +21,11 @@ const bookSchema = new mongoose.Schema(
       type: String,
       required: true,
       enum: [
-        "educational and social sciences",
-        "humanities",
-        "economic and administrative sciences",
-        "law books",
-        "language and literature books",
+        "العلوم التربوية والاجتماعية",
+        "العلوم الإنسانية",
+        "العلوم الاقتصادية والإدارية",
+        "كتب القانون",
+        "كتب اللغة والأدب",
       ],
     },
     subCategory: {
@@ -41,29 +41,20 @@ const bookSchema = new mongoose.Schema(
 );
 
 const categorySubMap = {
-  "educational and social sciences": ["psychology", "sociology", "education"],
-  humanities: [
-    "history",
-    "geography",
-    "philosophy and thought",
-    "culture",
-    "archaeology",
-    "heritage",
-    "media",
-    "sociology",
+  "العلوم التربوية والاجتماعية": ["علم النفس", "علم الاجتماع", "علم التربية"],
+  "العلوم الإنسانية": [
+    "التاريخ",
+    "الجغرافيا",
+    "الفلسفة والفكر",
+    "الثقافة",
+    "الآثار",
+    "التراث",
+    "الإعلام",
+    "علم الاجتماع",
   ],
-  "economic and administrative sciences": [
-    "management",
-    "economics",
-    "politics",
-  ],
-  "law books": ["law", "sharia and preaching"],
-  "language and literature books": [
-    "literature",
-    "language",
-    "dictionaries",
-    "poetry and stories",
-  ],
+  "العلوم الاقتصادية والإدارية": ["الإدارة", "الاقتصاد", "السياسة"],
+  "كتب القانون": ["القانون", "الشريعة والدعوة"],
+  "كتب اللغة والأدب": ["الأدب", "اللغة", "المعاجم", "الشعر والقصة"],
 };
 
 bookSchema.pre("validate", function (next) {
