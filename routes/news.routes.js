@@ -12,10 +12,10 @@ import {
 
 const router = express.Router();
 
-router.get("/news", getAllNews);
-router.get("/news/:id", getNewsById);
-router.post("/news", verifyToken, verifyAdmin, createOneNews);
-router.patch("/news/:id", verifyToken, verifyAdmin, updateNews);
-router.delete("/news/:id", verifyToken, verifyAdmin, deleteNews);
+router.get("/", getAllNews);
+router.get("/:id", getNewsById);
+router.post("/", verifyToken, verifyAdmin, createOneNews);
+router.patch("/:id", verifyToken, verifyAdmin, updateNews);
+router.delete("/:id", verifyToken, verifyAdmin, deleteNews);
 
 export default router;
