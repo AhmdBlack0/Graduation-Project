@@ -7,7 +7,6 @@ import {
   deleteBook,
   updateBook,
   updateCategoryImage,
-  getCategories,
   createCategory,
   getAllCategoriesWithSub,
 } from "../controllers/book.controller.js";
