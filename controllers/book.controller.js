@@ -89,30 +89,30 @@ export const getBooks = async (req, res) => {
 export const getBookById = async (req, res) => {
   try {
     const { id } = req.params;
-    const { page = 1, limit = 1 } = req.query;
+    const { page = 1, limit = 1 } = req.query; // page & limit for content pagination
 
     const book = await Book.findById(id);
-    if (!book) return res.status(404).json({ message: "Book not found" });
 
-    const parsedContent = safeParseJSON(book.content);
-
-    if (parsedContent?.pages && Array.isArray(parsedContent.pages)) {
-      const totalPages = parsedContent.pages.length;
-      const start = (page - 1) * limit;
-      const end = start + parseInt(limit);
-      const pagedContent = parsedContent.pages.slice(start, end);
-
-      return res.status(200).json({
-        totalPages,
-        currentPage: parseInt(page),
-        pages:
-          parseInt(limit) === 1 && pagedContent.length
-            ? pagedContent[0]
-            : pagedContent,
-      });
+    if (!book) {
+      return res.status(404).json({ message: "Book not found" });
     }
 
-    res.status(200).json({ page_number: 1, content: parsedContent });
+    // paginate the content array
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + parseInt(limit);
+
+    const paginatedContent = book.content.slice(startIndex, endIndex);
+
+    res.status(200).json({
+      _id: book._id,
+      title: book.title,
+      author: book.author,
+      details: book.details,
+      bookImg: book.bookImg,
+      totalPages: Math.ceil(book.content.length / limit),
+      currentPage: parseInt(page),
+      content: paginatedContent,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
