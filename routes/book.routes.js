@@ -16,6 +16,9 @@ import { verifyAdmin } from "../middlewares/verifyAdmin.js";
 
 const router = express.Router();
 
+router.get("/categories", verifyToken, verifyAdmin, getCategories);
+router.post("/categories", verifyToken, verifyAdmin, createCategory);
+
 router.post("/", verifyToken, verifyAdmin, createBook);
 router.get("/", getBooks);
 router.get("/:id", getBookById);
@@ -28,7 +31,5 @@ router.put(
   verifyAdmin,
   updateCategoryImage
 );
-router.get("/categories", verifyToken, verifyAdmin, getCategories);
-router.post("/categories", verifyToken, verifyAdmin, createCategory);
 
 export default router;
