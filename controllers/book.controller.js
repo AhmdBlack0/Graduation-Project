@@ -109,6 +109,7 @@ export const getBookById = async (req, res) => {
           parseInt(limit) === 1 && pagedContent.length
             ? pagedContent[0]
             : pagedContent,
+        book,
       });
     }
 
