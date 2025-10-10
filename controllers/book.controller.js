@@ -261,10 +261,16 @@ export const createCategory = async (req, res) => {
 
 export const getAllCategories = async (req, res) => {
   try {
-    // هتجيب كل الكتب مرة واحدة
-    const books = await Book.find();
+    const [books, categoriesFromDB] = await Promise.all([
+      Book.find(),
+      Category.find(),
+    ]);
 
-    // تجميع التصنيفات حسب الفئة الرئيسية
+    const categoryImageMap = {};
+    categoriesFromDB.forEach((cat) => {
+      categoryImageMap[cat.name] = cat.image;
+    });
+
     const categoriesMap = {};
 
     books.forEach((book) => {
@@ -274,7 +280,7 @@ export const getAllCategories = async (req, res) => {
       if (!categoriesMap[category]) {
         categoriesMap[category] = {
           name: category,
-          image: "", // تقدر تضيف صورة فيما بعد لو عندك
+          image: categoryImageMap[category] || "",
           subCategories: new Set(),
         };
       }
@@ -282,7 +288,7 @@ export const getAllCategories = async (req, res) => {
       categoriesMap[category].subCategories.add(subCategory);
     });
 
-    // تحويل الـ Sets إلى Arrays
+    // نحول الـ Sets إلى Arrays
     const categories = Object.values(categoriesMap).map((cat) => ({
       ...cat,
       subCategories: [...cat.subCategories],
