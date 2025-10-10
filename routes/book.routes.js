@@ -7,6 +7,8 @@ import {
   deleteBook,
   updateBook,
   updateCategoryImage,
+  getCategories,
+  createCategory,
 } from "../controllers/book.controller.js";
 
 import { verifyToken } from "../middlewares/verifyToken.js";
@@ -26,5 +28,7 @@ router.put(
   verifyAdmin,
   updateCategoryImage
 );
+router.get("/categories", verifyToken, verifyAdmin, getCategories);
+router.post("/categories", verifyToken, verifyAdmin, createCategory);
 
 export default router;

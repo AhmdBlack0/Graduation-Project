@@ -28,22 +28,17 @@ export const createBook = async (req, res) => {
 
     let finalBookImg = "";
 
-    // 📷 1. لو تم رفع صورة ملف
     if (req.file) {
       const result = await cloudinary.uploader.upload(req.file.path, {
         folder: "books",
       });
       finalBookImg = result.secure_url;
-    }
-    // 📷 2. لو تم إرسال Base64
-    else if (isBase64Image(bookImg)) {
+    } else if (isBase64Image(bookImg)) {
       const result = await cloudinary.uploader.upload(bookImg, {
         folder: "books",
       });
       finalBookImg = result.secure_url;
-    }
-    // 📷 3. لو مفيش صورة → استخدم صورة الكاتيجوري من قاعدة البيانات
-    else {
+    } else {
       const cat = await Category.findOne({ name: category });
       finalBookImg = cat?.image || "";
     }
@@ -65,7 +60,6 @@ export const createBook = async (req, res) => {
   }
 };
 
-// 🟡 عرض كل الكتب
 export const getBooks = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
@@ -92,7 +86,6 @@ export const getBooks = async (req, res) => {
   }
 };
 
-// 🟢 عرض كتاب محدد
 export const getBookById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -125,7 +118,6 @@ export const getBookById = async (req, res) => {
   }
 };
 
-// 🟡 تحديث كتاب
 export const updateBook = async (req, res) => {
   try {
     const { id } = req.params;
@@ -140,7 +132,6 @@ export const updateBook = async (req, res) => {
     if (subCategory) book.subCategory = subCategory;
     if (details) book.details = details;
 
-    // 📷 تحديث الصورة
     if (req.file) {
       const result = await cloudinary.uploader.upload(req.file.path, {
         folder: "books",
@@ -152,7 +143,6 @@ export const updateBook = async (req, res) => {
       });
       book.bookImg = result.secure_url;
     } else if (!bookImg && category) {
-      // لو مفيش صورة جديدة → استخدم صورة الكاتيجوري
       const cat = await Category.findOne({ name: category });
       book.bookImg = cat?.image || "";
     }
@@ -164,7 +154,6 @@ export const updateBook = async (req, res) => {
   }
 };
 
-// 🔵 تحديث محتوى صفحة واحدة داخل الكتاب
 export const updatePageContent = async (req, res) => {
   try {
     const { id } = req.params;
@@ -201,7 +190,6 @@ export const updatePageContent = async (req, res) => {
   }
 };
 
-// 🔴 حذف كتاب
 export const deleteBook = async (req, res) => {
   try {
     const { id } = req.params;
@@ -213,7 +201,6 @@ export const deleteBook = async (req, res) => {
   }
 };
 
-// 🟢 تحديث صورة الكاتيجوري (API مستقلة)
 export const updateCategoryImage = async (req, res) => {
   try {
     const { categoryName, image } = req.body;
@@ -242,6 +229,40 @@ export const updateCategoryImage = async (req, res) => {
       message: "Category image updated successfully",
       updatedCategory,
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const createCategory = async (req, res) => {
+  try {
+    const { name, subCategories } = req.body;
+    let imageUrl = "";
+
+    if (req.file) {
+      const uploaded = await cloudinary.uploader.upload(req.file.path, {
+        folder: "categories",
+      });
+      imageUrl = uploaded.secure_url;
+    }
+
+    const category = new Category({
+      name,
+      subCategories: subCategories ? JSON.parse(subCategories) : [],
+      image: imageUrl,
+    });
+
+    const saved = await category.save();
+    res.status(201).json(saved);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getCategories = async (req, res) => {
+  try {
+    const categories = await Category.find().sort({ createdAt: -1 });
+    res.status(200).json(categories);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
