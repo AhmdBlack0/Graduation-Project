@@ -261,28 +261,35 @@ export const createCategory = async (req, res) => {
 
 export const getAllCategories = async (req, res) => {
   try {
-    // هجيب كل الكاتيجوريز من الداتا بيز
-    const categories = await Category.find();
+    // هتجيب كل الكتب مرة واحدة
+    const books = await Book.find();
 
-    // هبني النتيجة النهائية
-    const result = await Promise.all(
-      categories.map(async (cat) => {
-        // أجيب الـsubcategories المميزة لكل category
-        const subCategories = await Book.distinct("subCategory", {
-          category: cat.name,
-        });
+    // تجميع التصنيفات حسب الفئة الرئيسية
+    const categoriesMap = {};
 
-        return {
-          name: cat.name,
-          image: cat.image,
-          subCategories,
+    books.forEach((book) => {
+      const category = book.category || "غير محدد";
+      const subCategory = book.subCategory || "غير محدد";
+
+      if (!categoriesMap[category]) {
+        categoriesMap[category] = {
+          name: category,
+          image: "", // تقدر تضيف صورة فيما بعد لو عندك
+          subCategories: new Set(),
         };
-      })
-    );
+      }
 
-    res.status(200).json(result);
+      categoriesMap[category].subCategories.add(subCategory);
+    });
+
+    // تحويل الـ Sets إلى Arrays
+    const categories = Object.values(categoriesMap).map((cat) => ({
+      ...cat,
+      subCategories: [...cat.subCategories],
+    }));
+
+    res.json(categories);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
