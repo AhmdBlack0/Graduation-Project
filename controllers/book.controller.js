@@ -259,11 +259,25 @@ export const createCategory = async (req, res) => {
   }
 };
 
-export const getAllCategories = async (req, res) => {
+export const getAllCategoriesWithSubs = async (req, res) => {
   try {
     const categories = await Category.find();
 
-    res.status(200).json(categories);
+    const result = await Promise.all(
+      categories.map(async (cat) => {
+        const subCategories = await Book.distinct("subCategory", {
+          category: cat.name,
+        });
+
+        return {
+          name: cat.name,
+          image: cat.image,
+          subCategories,
+        };
+      })
+    );
+
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
