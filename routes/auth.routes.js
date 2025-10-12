@@ -22,7 +22,7 @@ router.patch("/update-me", verifyToken, updateProfile);
 router.delete("/delete-me", verifyToken, deleteAccount);
 router.post("/verify-email", verifyEmail);
 router.post("/resend-verification", resendVerification);
-router.post("/forget-password", forgotPassword);
+// router.post("/forget-password", forgotPassword);
 router.post("/logout", verifyToken, logout);
 router.post("/reset-password", verifyToken, changePassword);
 

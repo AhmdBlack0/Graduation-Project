@@ -225,8 +225,8 @@ export const getMe = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { name, username } = req.body;
-    const updates = { name, username };
+    const { name } = req.body;
+    const updates = { name };
 
     const user = await User.findByIdAndUpdate(req.userId, updates, {
       new: true,
@@ -287,51 +287,7 @@ export const deleteAccount = async (req, res) => {
   }
 };
 
-export const forgotPassword = async (req, res) => {
-  try {
-    const { email } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    const resetToken = crypto.randomBytes(32).toString("hex");
-    user.resetPasswordToken = crypto
-      .createHash("sha256")
-      .update(resetToken)
-      .digest("hex");
-    user.resetPasswordExpires = Date.now() + 3600000;
-    await user.save();
-    const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
-    await transporter.sendMail({
-      from: `"My App" <${process.env.EMAIL_USER}>`,
-      to: user.email,
-      subject: "Password Reset Request",
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4;">
-          <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <h2 style="color: #333; margin-bottom: 20px;">Hello ${user.name},</h2>
-            <p style="color: #666; font-size: 16px; line-height: 1.5;">
-              You requested a password reset. Click the link below to reset your password:
-            </p>
-            <a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; margin: 20px 0; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
-              Reset Password
-            </a>
-            <p style="color: #999; font-size: 14px; margin-top: 20px;">
-              If you didn't request this, please ignore this email.
-            </p>
-          </div>
-        </div>
-      `,
-    });
-    res.status(200).json({
-      success: true,
-      message: "Password reset email sent",
-    });
-  } catch (error) {
-    console.error("Forgot Password Error:", error);
-    res.status(500).json({ message: error.message });
-  }
-};
+// export const forgotPassword = async (req, res) => {};
 
 export const logout = async (req, res) => {
   try {
