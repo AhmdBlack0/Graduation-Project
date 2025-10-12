@@ -4,7 +4,7 @@ import {
   login,
   verifyEmail,
   resendVerification,
-  forgotPassword,
+  // forgotPassword,
   getMe,
   updateProfile,
   deleteAccount,
