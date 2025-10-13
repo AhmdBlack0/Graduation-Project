@@ -23,8 +23,8 @@ router.patch("/update-me", verifyToken, updateProfile);
 router.delete("/delete-me", verifyToken, deleteAccount);
 router.post("/verify-email", verifyEmail);
 router.post("/resend-verification", verifyToken, resendVerification);
-router.post("/forget-password", verifyToken, forgotPassword);
-router.post("/reset-forget-password", verifyToken, resetForgetPassword);
+router.post("/forget-password", forgotPassword);
+router.post("/reset-forget-password", resetForgetPassword);
 router.post("/logout", verifyToken, logout);
 router.post("/reset-password", verifyToken, changePassword);
 
