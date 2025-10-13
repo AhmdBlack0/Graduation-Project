@@ -287,7 +287,74 @@ export const deleteAccount = async (req, res) => {
   }
 };
 
-// export const forgotPassword = async (req, res) => {};
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    user.resetPasswordCode = resetCode;
+    user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 min
+    await user.save();
+
+    await transporter.sendMail({
+      from: `"My App" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject: "Reset your password",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+          <h2>Password Reset Code</h2>
+          <p>Use the code below to reset your password. It will expire in 10 minutes:</p>
+          <div style="font-size: 32px; font-weight: bold; color: #007bff; margin: 20px 0;">
+            ${resetCode}
+          </div>
+          <p>If you didn't request this, ignore this email.</p>
+        </div>
+      `,
+    });
+
+    res.json({ success: true, message: "Reset code sent to your email" });
+  } catch (error) {
+    console.error("Forgot Password Error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const resetForgetPassword = async (req, res) => {
+  try {
+    const { email, code, newPassword } = req.body;
+
+    const user = await User.findOne({
+      email,
+      resetPasswordCode: code,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        message: "Invalid or expired reset code",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    user.resetPasswordCode = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset successfully. You can now log in.",
+    });
+  } catch (error) {
+    console.error("Reset Password Error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
 
 export const logout = async (req, res) => {
   try {
