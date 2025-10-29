@@ -9,7 +9,7 @@ const register = asyncHandler(async (req, res) => {
 
   const existingUser = await User.findOne({ email: email.toLowerCase() });
   if (existingUser) {
-    throw new AppError("البريد الإلكتروني مستخدم بالفعل", 400);
+    throw new AppError("Email Exists ", 400);
   }
 
   const salt = await bcrypt.genSalt(12);
@@ -28,7 +28,7 @@ const register = asyncHandler(async (req, res) => {
 
   res.status(201).json({
     success: true,
-    message: "تم إنشاء الحساب بنجاح",
+    message: "Account created successfully",
   });
 });
 
@@ -39,12 +39,12 @@ const login = asyncHandler(async (req, res) => {
     "+password"
   );
   if (!user) {
-    throw new AppError("بيانات الدخول غير صحيحة", 401);
+    throw new AppError("User not found", 401);
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
-    throw new AppError("بيانات الدخول غير صحيحة", 401);
+    throw new AppError("Password is incorrect", 401);
   }
 
   await user.save();
@@ -56,7 +56,7 @@ const login = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "تم تسجيل الدخول بنجاح",
+    message: "Logged in successfully",
     token,
   });
 });
@@ -101,7 +101,7 @@ const updateProfile = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "تم تحديث البيانات بنجاح",
+    message: "Profile updated successfully",
     user,
   });
 });
@@ -131,7 +131,7 @@ const changePassword = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "تم تغيير كلمة المرور بنجاح",
+    message: "Password changed successfully",
   });
 });
 
@@ -140,7 +140,7 @@ const deleteAccount = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(userId);
   res.json({
     success: true,
-    message: "تم حذف الحساب بنجاح",
+    message: "Account deleted successfully",
   });
 });
 
@@ -148,31 +148,31 @@ const registerValidation = [
   body("name")
     .trim()
     .notEmpty()
-    .withMessage("الاسم مطلوب")
+    .withMessage("Name is required")
     .isLength({ min: 2, max: 50 })
-    .withMessage("الاسم يجب أن يكون بين 2 و 50 حرف"),
+    .withMessage("Name must be between 2 and 50 characters"),
 
   body("email")
     .isEmail()
-    .withMessage("البريد الإلكتروني غير صحيح")
+    .withMessage("Invalid email format")
     .normalizeEmail()
     .toLowerCase(),
 
   body("password")
     .isLength({ min: 6 })
-    .withMessage("كلمة المرور يجب أن تكون 6 أحرف على الأقل")
+    .withMessage("Password must be at least 6 characters long")
     .matches(/^(?=.*[a-zA-Z])(?=.*\d)/)
-    .withMessage("كلمة المرور يجب أن تحتوي على أحرف وأرقام"),
+    .withMessage("Password must contain both letters and numbers"),
 ];
 
 const loginValidation = [
   body("email")
     .isEmail()
-    .withMessage("البريد الإلكتروني غير صحيح")
+    .withMessage("Email format is invalid")
     .normalizeEmail()
     .toLowerCase(),
 
-  body("password").notEmpty().withMessage("كلمة المرور مطلوبة"),
+  body("password").notEmpty().withMessage("Password is required"),
 ];
 
 const updateProfileValidation = [
@@ -180,24 +180,26 @@ const updateProfileValidation = [
     .optional()
     .trim()
     .isLength({ min: 2, max: 50 })
-    .withMessage("الاسم يجب أن يكون بين 2 و 50 حرف"),
+    .withMessage("Name must be between 2 and 50 characters"),
 
   body("email")
     .optional()
     .isEmail()
-    .withMessage("البريد الإلكتروني غير صحيح")
+    .withMessage("Invalid email format")
     .normalizeEmail()
     .toLowerCase(),
 ];
 
 const changePasswordValidation = [
-  body("currentPassword").notEmpty().withMessage("كلمة المرور الحالية مطلوبة"),
+  body("currentPassword")
+    .notEmpty()
+    .withMessage("Current password is required"),
 
   body("newPassword")
     .isLength({ min: 6 })
-    .withMessage("كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل")
+    .withMessage("New password must be at least 6 characters long")
     .matches(/^(?=.*[a-zA-Z])(?=.*\d)/)
-    .withMessage("كلمة المرور الجديدة يجب أن تحتوي على أحرف وأرقام"),
+    .withMessage("New password must contain both letters and numbers"),
 ];
 
 export {
