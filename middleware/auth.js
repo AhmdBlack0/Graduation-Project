@@ -1,10 +1,16 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
-export const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, {
-    expiresIn: "2h",
-  });
+// ✅ تضمين role في الـ JWT
+export const generateToken = (user) => {
+  return jwt.sign(
+    {
+      userId: user._id,
+      role: user.role,
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "2h" }
+  );
 };
 
 export const verifyToken = (token) => {
@@ -15,16 +21,10 @@ export const verifyToken = (token) => {
   }
 };
 
+// ✅ مصادقة المستخدم
 export const authenticate = async (req, res, next) => {
   try {
     const authHeader = req.header("Authorization");
-
-    console.log("Authentication check:", {
-      hasAuthHeader: !!authHeader,
-      authHeader: authHeader ? authHeader.substring(0, 20) + "..." : "none",
-      method: req.method,
-      url: req.url,
-    });
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
@@ -36,6 +36,7 @@ export const authenticate = async (req, res, next) => {
     const token = authHeader.substring(7);
     const decoded = verifyToken(token);
 
+    // 🔹 جلب المستخدم من قاعدة البيانات
     const user = await User.findById(decoded.userId).select("-password");
 
     if (!user) {
@@ -45,7 +46,7 @@ export const authenticate = async (req, res, next) => {
       });
     }
 
-    req.user = user;
+    req.user = user; // يتيح الوصول لاحقًا للـ role والبيانات الأخرى
     next();
   } catch (error) {
     console.log("Authentication error:", error.message);
@@ -56,6 +57,7 @@ export const authenticate = async (req, res, next) => {
   }
 };
 
+// ✅ مصادقة اختيارية (مثلاً لصفحات عامة)
 export const optionalAuth = async (req, res, next) => {
   try {
     const authHeader = req.header("Authorization");
@@ -65,19 +67,20 @@ export const optionalAuth = async (req, res, next) => {
       const decoded = verifyToken(token);
       const user = await User.findById(decoded.userId).select("-password");
 
-      if (user && user.isActive) {
+      if (user) {
         req.user = user;
       }
     }
 
     next();
-  } catch (error) {
+  } catch {
     next();
   }
 };
 
+// ✅ السماح فقط للمشرفين
 export const authorizeAdmin = (req, res, next) => {
-  if (req.user.role !== "admin") {
+  if (!req.user || req.user.role !== "admin") {
     return res.status(403).json({
       success: false,
       message: "Access denied: Admins only",
