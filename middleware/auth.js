@@ -1,12 +1,11 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
-// ✅ تضمين role في الـ JWT
-export const generateToken = (user) => {
+export const generateToken = (userId, role) => {
   return jwt.sign(
     {
-      userId: user._id,
-      role: user.role,
+      userId,
+      role,
     },
     process.env.JWT_SECRET,
     { expiresIn: "2h" }
