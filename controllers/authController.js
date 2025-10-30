@@ -49,7 +49,7 @@ const login = asyncHandler(async (req, res) => {
 
   await user.save();
 
-  const token = generateToken(user); // ✅ Pass the whole user object
+  const token = generateToken(user._id, user.role); // ✅ Pass userId and role separately
 
   const userResponse = user.toObject();
   delete userResponse.password;
@@ -58,7 +58,7 @@ const login = asyncHandler(async (req, res) => {
     success: true,
     message: "Logged in successfully",
     token,
-    user: userResponse, // ✅ Optional: return user data
+    user: userResponse,
   });
 });
 

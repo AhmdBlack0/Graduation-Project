@@ -1,16 +1,20 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
-export const generateToken = (userId, role) => {
+// في auth.js
+export const generateToken = (user) => {
   return jwt.sign(
     {
-      userId,
-      role,
+      userId: user._id,
+      role: user.role,
     },
     process.env.JWT_SECRET,
     { expiresIn: "2h" }
   );
 };
+
+// login يبقى زي ما هو
+const token = generateToken(user); // ✅ يشتغل صح
 
 export const verifyToken = (token) => {
   try {
