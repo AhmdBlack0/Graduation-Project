@@ -3,7 +3,7 @@ import cloudinary from "../config/cloudinary.js";
 
 export const uploadDocument = async (req, res) => {
   try {
-    const { base64File, filename, title, content } = req.body;
+    const { base64File, filename, title, content, category } = req.body;
 
     const uploadedResponse = await cloudinary.uploader.upload(base64File, {
       folder: "reports",
@@ -17,6 +17,7 @@ export const uploadDocument = async (req, res) => {
     const document = new Document({
       title,
       content,
+      category,
       fileUrl,
     });
     await document.save();

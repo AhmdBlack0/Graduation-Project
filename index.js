@@ -8,7 +8,6 @@ import dotenv from "dotenv";
 dotenv.config();
 import connectDB from "./db/connectDB.js";
 
-// Use ES6 imports consistently
 import authRoutes from "./routes/auth.js";
 import documentRoutes from "./routes/documents.js";
 // import bookRoutes from "./routes/books.js";
@@ -65,7 +64,6 @@ app.use(
   process.env.NODE_ENV === "development" ? morgan("dev") : morgan("combined")
 );
 
-// 📚 Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/documents", documentRoutes);
 // app.use("/api/books", bookRoutes);
