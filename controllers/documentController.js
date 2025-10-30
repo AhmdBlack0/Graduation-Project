@@ -7,7 +7,7 @@ export const uploadDocument = async (req, res) => {
 
     const uploadedResponse = await cloudinary.uploader.upload(base64File, {
       folder: "reports",
-      resource_type: "raw",
+      resource_type: "auto",
       public_id: filename,
       use_filename: true,
       unique_filename: false,
