@@ -49,7 +49,7 @@ const login = asyncHandler(async (req, res) => {
 
   await user.save();
 
-  const token = generateToken(user._id, user.role); // ✅ Pass userId and role separately
+  const token = generateToken(user); // ✅ هيشتغل دلوقتي
 
   const userResponse = user.toObject();
   delete userResponse.password;

@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
-// في auth.js
+// في middleware/auth.js
 export const generateToken = (user) => {
   return jwt.sign(
     {
@@ -12,10 +12,6 @@ export const generateToken = (user) => {
     { expiresIn: "2h" }
   );
 };
-
-// login يبقى زي ما هو
-const token = generateToken(user); // ✅ يشتغل صح
-
 export const verifyToken = (token) => {
   try {
     return jwt.verify(token, process.env.JWT_SECRET);
