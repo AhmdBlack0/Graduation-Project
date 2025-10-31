@@ -52,7 +52,10 @@ app.use("/api/auth/register", limiter);
 
 app.use(
   cors({
-    origin: "http://localhost:5174",
+    origin: [
+      "http://localhost:5174",
+      "https://ai-legal-opal.vercel.app", 
+    ],
     credentials: true,
   })
 );
