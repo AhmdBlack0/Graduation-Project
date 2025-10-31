@@ -35,22 +35,29 @@ const register = asyncHandler(async (req, res) => {
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
+  // Input validation
+  if (!email || !password) {
+    throw new AppError("Email and password are required", 400);
+  }
+
   const user = await User.findOne({ email: email.toLowerCase() }).select(
     "+password"
   );
-  if (!user) {
-    throw new AppError("User not found", 401);
+
+  // Check user exists and password is valid
+  const isPasswordValid =
+    user && (await bcrypt.compare(password, user.password));
+
+  if (!user || !isPasswordValid) {
+    throw new AppError("Invalid email or password", 401);
   }
 
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) {
-    throw new AppError("Password is incorrect", 401);
-  }
+  // Remove the unnecessary save
+  // await user.save();
 
-  await user.save();
+  const token = generateToken(user);
 
-  const token = generateToken(user._id);
-
+  // Remove password from response
   const userResponse = user.toObject();
   delete userResponse.password;
 
@@ -58,6 +65,7 @@ const login = asyncHandler(async (req, res) => {
     success: true,
     message: "Logged in successfully",
     token,
+    user: userResponse,
   });
 });
 

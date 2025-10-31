@@ -13,14 +13,20 @@ export const uploadDocument = async (req, res) => {
       unique_filename: false,
       access_mode: "public",
     });
-    const fileUrl = uploadedResponse.secure_url;
+
+    console.log("Cloudinary response:", uploadedResponse);
+
+    const fileUrl = uploadedResponse.secure_url || uploadedResponse.url;
+
     const document = new Document({
       title,
       content,
       category,
       fileUrl,
     });
+
     await document.save();
+
     res
       .status(201)
       .json({ message: "Document uploaded successfully", data: document });
