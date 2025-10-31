@@ -10,9 +10,7 @@ import connectDB from "./db/connectDB.js";
 
 import authRoutes from "./routes/auth.js";
 import documentRoutes from "./routes/documents.js";
-// import bookRoutes from "./routes/books.js";
-// import adminRoutes from "./routes/admin.js";
-
+import usersRoutes from "./routes/users.routes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { notFound } from "./middleware/notFound.js";
 
@@ -66,8 +64,7 @@ app.use(
 
 app.use("/api/auth", authRoutes);
 app.use("/api/documents", documentRoutes);
-// app.use("/api/books", bookRoutes);
-// app.use("/api/admin", adminRoutes);
+app.use("/api/users", usersRoutes);
 
 app.get("/", (req, res) => {
   res.send("✅ Server is running successfully!");
