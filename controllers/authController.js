@@ -29,6 +29,7 @@ const register = asyncHandler(async (req, res) => {
   res.status(201).json({
     success: true,
     message: "Account created successfully",
+    user: userResponse,
   });
 });
 
