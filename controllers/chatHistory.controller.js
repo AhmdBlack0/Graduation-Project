@@ -1,7 +1,7 @@
 import chatHistoryModel from "../models/chatHistory.model.js";
 import cloudinary from "../config/cloudinary.js";
 import { asyncHandler, AppError } from "../middleware/errorHandler.js";
-
+import User from "../models/User.js";
 export const uploadChatHistory = asyncHandler(async (req, res) => {
   const { question, answer } = req.body;
   const userId = req.user.id; // جاية من auth middleware
