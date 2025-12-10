@@ -11,6 +11,7 @@ import connectDB from "./db/connectDB.js";
 import authRoutes from "./routes/auth.js";
 import documentRoutes from "./routes/documents.js";
 import usersRoutes from "./routes/users.routes.js";
+import chatHistoryRoutes from "./routes/chatHistory.routes.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { notFound } from "./middleware/notFound.js";
 
@@ -50,10 +51,7 @@ app.use("/api/auth/register", limiter);
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5174",
-      "https://ai-legal-opal.vercel.app", 
-    ],
+    origin: ["http://localhost:5174", "https://ai-legal-opal.vercel.app"],
     credentials: true,
   })
 );
@@ -68,6 +66,7 @@ app.use(
 app.use("/api/auth", authRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/users", usersRoutes);
+app.use("/api/chatHistory", chatHistoryRoutes);
 
 app.get("/", (req, res) => {
   res.send("✅ Server is running successfully!");
