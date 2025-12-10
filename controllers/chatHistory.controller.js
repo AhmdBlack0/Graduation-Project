@@ -21,6 +21,9 @@ export const uploadChatHistory = asyncHandler(async (req, res) => {
     answer,
     reportImageUrl,
   });
+  await User.findByIdAndUpdate(userId, {
+    $push: { chatHistory: chatHistory._id },
+  });
 
   res.status(201).json({
     success: true,
