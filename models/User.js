@@ -29,10 +29,12 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
-    chatHistory: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "ChatHistory",
-    },
+    chatHistory: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ChatHistory",
+      },
+    ],
   },
   {
     timestamps: true,

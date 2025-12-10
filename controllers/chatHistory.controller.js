@@ -4,6 +4,8 @@ import { asyncHandler, AppError } from "../middleware/errorHandler.js";
 
 export const uploadChatHistory = asyncHandler(async (req, res) => {
   const { question, answer } = req.body;
+  const userId = req.user.id; // جاية من auth middleware
+
   let reportImageUrl = null;
 
   if (req.file) {
@@ -12,11 +14,14 @@ export const uploadChatHistory = asyncHandler(async (req, res) => {
     });
     reportImageUrl = result.secure_url;
   }
+
   const chatHistory = await chatHistoryModel.create({
+    user: userId,
     question,
     answer,
     reportImageUrl,
   });
+
   res.status(201).json({
     success: true,
     message: "Chat history uploaded successfully",
@@ -25,33 +30,37 @@ export const uploadChatHistory = asyncHandler(async (req, res) => {
 });
 
 export const getChatHistories = asyncHandler(async (req, res) => {
-  const chatHistories = await chatHistoryModel.find().sort({ createdAt: -1 });
+  const userId = req.user.id;
+  const chatHistories = await chatHistoryModel
+    .find({ user: userId })
+    .sort({ createdAt: -1 });
   res.status(200).json({
     success: true,
     data: chatHistories,
   });
 });
 
-export const getChatHistoryById = asyncHandler(async (req, res) => {
+export const deleteChatHistory = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
-  const chatHistory = await chatHistoryModel.findById(id);
-  if (!chatHistory) {
-    throw new AppError("Chat history not found", 404);
-  }
-  res.status(200).json({
-    success: true,
-    data: chatHistory,
+  const userId = req.user.id;
+  const chatHistory = await chatHistoryModel.findOneAndDelete({
+    _id: id,
+    user: userId,
   });
-});
-
-export const deleteChatHistory = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const chatHistory = await chatHistoryModel.findByIdAndDelete(id);
   if (!chatHistory) {
-    throw new AppError("Chat history not found", 404);
+    return next(new AppError("Chat history not found or unauthorized", 404));
   }
   res.status(200).json({
     success: true,
     message: "Chat history deleted successfully",
+  });
+});
+
+export const clearChatHistories = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  await chatHistoryModel.deleteMany({ user: userId });
+  res.status(200).json({
+    success: true,
+    message: "All chat histories cleared successfully",
   });
 });

@@ -1,20 +1,16 @@
 import mongoose from "mongoose";
-
 const chatHistorySchema = new mongoose.Schema(
   {
-    question: {
-      type: String,
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-    answer: {
-      type: String,
-    },
-    reportImageUrl: {
-      type: String,
-    },
+    question: String,
+    answer: String,
+    reportImageUrl: String,
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
-
-export default mongoose.model("ChatHistory", chatHistorySchema);
+const ChatHistory = mongoose.model("ChatHistory", chatHistorySchema);
+export default ChatHistory;
