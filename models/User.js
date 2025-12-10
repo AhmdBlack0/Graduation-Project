@@ -29,23 +29,9 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
-    usage: {
-      questionsToday: {
-        type: Number,
-        default: 0,
-      },
-      lastQuestionDate: {
-        type: Date,
-        default: Date.now,
-      },
-      totalQuestions: {
-        type: Number,
-        default: 0,
-      },
-      documentsUploaded: {
-        type: Number,
-        default: 0,
-      },
+    chatHistory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ChatHistory",
     },
   },
   {
